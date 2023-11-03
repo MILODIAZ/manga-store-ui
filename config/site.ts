@@ -1,69 +1,49 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-	name: "Next.js + NextUI",
-	description: "Make beautiful websites regardless of your design experience.",
+	name: 'MangaStore',
+	description: 'Los mejores mangas!.',
 	navItems: [
 		{
-			label: "Home",
-			href: "/",
+			label: 'Inicio',
+			href: '/',
 		},
-    {
-      label: "Docs",
-      href: "/docs",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
-    {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
-      label: "About",
-      href: "/about",
-    }
+		{
+			label: 'Colección',
+			href: '/collection',
+		},
+		{
+			label: 'Contacto',
+			href: '/contact',
+		},
+		{
+			label: 'Acerca de',
+			href: '/about',
+		},
 	],
 	navMenuItems: [
 		{
-			label: "Profile",
-			href: "/profile",
+			label: 'Inicio',
+			href: '/',
 		},
 		{
-			label: "Dashboard",
-			href: "/dashboard",
+			label: 'Colección',
+			href: '/collection',
 		},
 		{
-			label: "Projects",
-			href: "/projects",
+			label: 'Contacto',
+			href: '/contact',
 		},
 		{
-			label: "Team",
-			href: "/team",
-		},
-		{
-			label: "Calendar",
-			href: "/calendar",
-		},
-		{
-			label: "Settings",
-			href: "/settings",
-		},
-		{
-			label: "Help & Feedback",
-			href: "/help-feedback",
-		},
-		{
-			label: "Logout",
-			href: "/logout",
+			label: 'Acerca de',
+			href: '/about',
 		},
 	],
 	links: {
-		github: "https://github.com/nextui-org/nextui",
-		twitter: "https://twitter.com/getnextui",
-		docs: "https://nextui-docs-v2.vercel.app",
-		discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev"
+		github: 'https://github.com/nextui-org/nextui',
+		twitter: 'https://twitter.com/getnextui',
+		docs: 'https://nextui-docs-v2.vercel.app',
+		discord: 'https://discord.gg/9b6yyZKmH4',
+		sponsor: 'https://patreon.com/jrgarciadev',
 	},
 };
