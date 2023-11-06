@@ -12,53 +12,13 @@ import {
 	Pagination,
 	Accordion,
 	AccordionItem,
+	Link,
 } from '@nextui-org/react';
 import { title, subtitle } from '@/components/primitives';
 import { SearchIcon } from '@/components/icons';
+import { database as list } from '@/components/database';
 
 export default function CollectionPage() {
-	const list = [
-		{
-			title: 'Naruto #1',
-			img: 'https://images.cdn2.buscalibre.com/fit-in/360x360/49/bb/49bbd5156c3b634e5a118938c974440b.jpg',
-			price: '$5.50',
-		},
-		{
-			title: 'Attack on Titan #1',
-			img: 'https://cdnx.jumpseller.com/shazam-online/image/17332513/1.jpg?1625328829',
-			price: '$3.00',
-		},
-		{
-			title: 'Hunter X Hunter #1',
-			img: 'https://images.cdn3.buscalibre.com/fit-in/360x360/5c/55/5c558c0472e5b78726e7c703aa5a55e8.jpg',
-			price: '$10.00',
-		},
-		{
-			title: 'Slam Dunk #1',
-			img: 'https://cdnx.jumpseller.com/shazam-online/image/16713613/187399676_10159106106169246_2618465024110458039_n__2_.jpg?1644614770',
-			price: '$5.30',
-		},
-		{
-			title: 'Full Metal Alchemist #1',
-			img: 'https://images.cdn2.buscalibre.com/fit-in/360x360/35/ad/35adda162d2241148a057fae26520792.jpg',
-			price: '$15.70',
-		},
-		{
-			title: 'Dr. Stone #1',
-			img: 'https://cdnx.jumpseller.com/kioscosch/image/17176007/Dr._Stone_1.jpg?1623959648',
-			price: '$8.00',
-		},
-		{
-			title: 'Dragon Ball Z #3',
-			img: 'https://www.worldsendcomics.com//images/content/products/2018-10/78200903353000311.jpg',
-			price: '$7.50',
-		},
-		{
-			title: 'Akira #1',
-			img: 'https://www.crazyallcomics.cl/media/catalog/product/cache/23/image/500x400/17f82f742ffe127f42dca9de82fb58b1/a/k/akira_esp_01.jpg',
-			price: '$12.20',
-		},
-	];
 	return (
 		<DefaultLayout>
 			<div className='flex justify-center'>
@@ -245,33 +205,32 @@ export default function CollectionPage() {
 							<div className='flex flex-col gap-12 justify-center'>
 								<div className='gap-2 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
 									{list.map((item, index) => (
-										<Card
+										<Link key={item.id} href={`/product/${item.id}`}>
+										
+										  <Card
 											className='max-w-[222px]'
 											shadow='sm'
-											key={index}
 											isPressable
-											onPress={() =>
-												console.log('item pressed')
-											}
-										>
+											onPress={() => console.log('item pressed')}
+										  >
 											<CardBody className='overflow-visible p-0'>
-												<Image
-													isZoomed
-													shadow='sm'
-													radius='lg'
-													width='100%'
-													alt={item.title}
-													className='w-full object-cover h-[300px] md:h-[340px]'
-													src={item.img}
-												/>
+											  <Image
+												isZoomed
+												shadow='sm'
+												radius='lg'
+												width='100%'
+												alt={item.name}
+												className='w-full object-cover h-[300px] md:h-[340px]'
+												src={item.image}
+											  />
 											</CardBody>
 											<CardFooter className='text-small justify-between max-w-[222px]'>
-												<b>{item.title}</b>
-												<p className='text-default-500'>
-													{item.price}
-												</p>
+											  <b>{item.name}</b>
+											  <p className='text-default-500'>{item.price}</p>
 											</CardFooter>
-										</Card>
+										  </Card>
+					
+									  </Link>
 									))}
 								</div>
 							</div>
