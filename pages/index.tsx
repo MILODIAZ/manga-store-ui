@@ -36,11 +36,22 @@ export default function IndexPage() {
             </Button>
           </Link>
         </div>
+      </section>
 
-        <div className='gap-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
-          {list.map((item) => (
-            <Link href={`/product/${item.id}`} key={item.id}>
-              <Card shadow='sm' isPressable onPress={() => console.log('item pressed')}>
+      <section className='flex flex-col items-center justify-center gap-12 py-8 md:py-10'>
+        <div className='flex'>
+          <h1 className={title({ color: 'yellow' })}>
+            Novedades&nbsp;
+          </h1>
+        </div>
+        <div className='gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
+          {list.map((item, index) => (
+            <Link href={`/product/${item.id}`} key={index}>
+              <Card
+                shadow='sm'
+                isPressable
+                onPress={() => console.log('item pressed')}
+              >
                 <CardBody className='overflow-visible p-0'>
                   <Image
                     isZoomed
@@ -60,7 +71,14 @@ export default function IndexPage() {
             </Link>
           ))}
         </div>
+        <Link href="/collection">
+            <Button color='primary' className='text-xs py-1'>
+              VER NUESTRA COLECCIÓN
+            </Button>
+        </Link>
       </section>
     </DefaultLayout>
   );
 }
+
+
