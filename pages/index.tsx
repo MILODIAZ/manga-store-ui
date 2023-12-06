@@ -5,9 +5,12 @@ import { title, subtitle } from '@/components/primitives';
 import { Button, Image, Card, CardBody, CardFooter } from '@nextui-org/react';
 import { getProducts } from './api/api';
 import { useEffect, useState } from 'react';
+import { createTransaction } from './api/api';
 
 export default function IndexPage() {
 	const [hotProducts, setHotProducts] = useState([]);
+	const [token, setToken] = useState('');
+	const [url, setURL] = useState('');
 
 	// const refreshPage = async () => {
 	// 	setHotProducts([]);
@@ -21,7 +24,15 @@ export default function IndexPage() {
 			} catch (error) {}
 		};
 		fetchData();
-	}, [hotProducts]);
+	}, []);
+
+	const createT = async () => {
+		try {
+			const result = await createTransaction();
+			setToken(result.token);
+			setURL(result.url);
+		} catch (error) {}
+	};
 
 	return (
 		<DefaultLayout>
@@ -30,6 +41,15 @@ export default function IndexPage() {
 					Mostrar datos GraphQL
 				</Button>
 			</div> */}
+			<section>
+				<Button onPress={() => createT()}>crear transacción</Button>
+			</section>
+			<section>
+				<form method='get' action={url}>
+					<input type='hidden' name='token_ws' value={token} />
+					<input type='submit' value='Ir a pagar' />
+				</form>
+			</section>
 			<section className='flex flex-col items-center justify-center gap-4 py-8 md:py-10'>
 				<div className='inline-block text-center justify-center'>
 					<h1 className={title({ color: 'violet' })}>
@@ -68,34 +88,43 @@ export default function IndexPage() {
 					</h1>
 				</div>
 				<div className='gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
-					{hotProducts.map((item: any, index) => (
-						<Link href={`/product/${item.id}`} key={item.id}>
-							<Card
-								shadow='sm'
-								isPressable
-								onPress={() => console.log('item pressed')}
-							>
-								<CardBody className='overflow-visible p-0'>
-									<Image
-										isZoomed
+					{hotProducts.map(
+						(item: any) =>
+							item.isFavourite && (
+								<Link
+									href={`/product/${item.id}`}
+									key={item.id}
+								>
+									<Card
 										shadow='sm'
-										radius='lg'
-										width='100%'
-										alt={item.name}
-										className='w-full object-cover h-[310px]'
-										src={item.image}
-									/>
-								</CardBody>
-								<CardFooter className='text-small justify-between max-w-[222px]'>
-									<b>{item.name}</b>
-									<p className='text-default-500'>
-										${item.price}
-									</p>
-								</CardFooter>
-							</Card>
-						</Link>
-					))}
+										isPressable
+										onPress={() =>
+											console.log('item pressed')
+										}
+									>
+										<CardBody className='overflow-visible p-0'>
+											<Image
+												isZoomed
+												shadow='sm'
+												radius='lg'
+												width='100%'
+												alt={item.name}
+												className='w-full object-cover h-[310px]'
+												src={item.image}
+											/>
+										</CardBody>
+										<CardFooter className='text-small justify-between max-w-[222px]'>
+											<b>{item.name}</b>
+											<p className='text-default-500'>
+												${item.price}
+											</p>
+										</CardFooter>
+									</Card>
+								</Link>
+							)
+					)}
 				</div>
+
 				<Link href='/collection'>
 					<Button color='primary' className='text-xs py-1'>
 						VER NUESTRA COLECCIÓN

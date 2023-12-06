@@ -13,12 +13,59 @@ import {
 	Accordion,
 	AccordionItem,
 	Link,
+	Select,
+	SelectItem,
 } from '@nextui-org/react';
-import { title, subtitle } from '@/components/primitives';
 import { SearchIcon } from '@/components/icons';
-import { database as list } from '@/components/database';
+import { useEffect, useState } from 'react';
+import { getProducts, getCategories } from './api/api';
 
 export default function CollectionPage() {
+	const [products, setProducts] = useState([]);
+	const [categories, setCategories] = useState([]);
+	const [categoryFilter, setCategoryFilter] = useState<string>('');
+	const handleSelectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setCategoryFilter(e.target.value);
+	};
+	const [nameFilter, setNameFilter] = useState<string>('');
+	const [minPriceFilter, setMinPriceFilter] = useState<string>('');
+	const [maxPriceFilter, setMaxPriceFilter] = useState<string>('');
+	const cleanFilters = () => {
+		setMinPriceFilter('');
+		setMaxPriceFilter('');
+		setNameFilter('');
+		fetchProducts();
+	};
+
+	const fetchProducts = async (
+		categoryId?: number,
+		search?: string,
+		minPrice?: number,
+		maxPrice?: number
+	) => {
+		try {
+			const result = await getProducts(
+				categoryId !== 0 ? categoryId : undefined,
+				search !== '' ? search : undefined,
+				minPrice !== 0 ? minPrice : undefined,
+				maxPrice !== 0 ? maxPrice : undefined
+			);
+			setProducts(result);
+		} catch (error) {}
+	};
+
+	const fetchCategories = async () => {
+		try {
+			const result = await getCategories();
+			setCategories(result);
+		} catch (error) {}
+	};
+
+	useEffect(() => {
+		fetchProducts();
+		fetchCategories();
+	}, []);
+
 	return (
 		<DefaultLayout>
 			<div className='flex justify-center'>
@@ -49,6 +96,8 @@ export default function CollectionPage() {
 									<SearchIcon className='text-base text-default-400 pointer-events-none flex-shrink-0' />
 								}
 								type='search'
+								value={nameFilter}
+								onValueChange={setNameFilter}
 							/>
 							<Input
 								type='number'
@@ -62,6 +111,8 @@ export default function CollectionPage() {
 										</span>
 									</div>
 								}
+								value={minPriceFilter}
+								onValueChange={setMinPriceFilter}
 							/>
 							<Input
 								type='number'
@@ -75,39 +126,51 @@ export default function CollectionPage() {
 										</span>
 									</div>
 								}
+								value={maxPriceFilter}
+								onValueChange={setMaxPriceFilter}
 							/>
 							<div className='max-h-full overflow-y-auto'>
-								<CheckboxGroup
-									label='Categorías'
-									defaultValue={['acción', 'carreras']}
+								<Select
+									selectedKeys={categoryFilter}
+									onChange={handleSelectionChange}
+									label='Categoría'
+									placeholder='Elige una categoría'
+									className='max-w-xs'
 								>
-									<Checkbox value='acción'>Acción</Checkbox>
-									<Checkbox value='artes marciales'>
-										Artes Marciales
-									</Checkbox>
-									<Checkbox value='aventuras'>
-										Aventuras
-									</Checkbox>
-									<Checkbox value='carreras'>
-										Carreras
-									</Checkbox>
-									<Checkbox value='ciencia ficción'>
-										Ciencia Ficción
-									</Checkbox>
-									<Checkbox value='comedia'>Comedia</Checkbox>
-									<Checkbox value='demencia'>
-										Demencia
-									</Checkbox>
-									<Checkbox value='demonios'>
-										Demonios
-									</Checkbox>
-									<Checkbox value='deportes'>
-										Deportes
-									</Checkbox>
-									<Checkbox value='drama'>Drama</Checkbox>
-									<Checkbox value='ecchi'>Ecchi</Checkbox>
-								</CheckboxGroup>
+									<SelectItem key={0} value={0}>
+										Todas
+									</SelectItem>
+									{categories.map((category: any) => (
+										<SelectItem
+											key={category.id}
+											value={category.id}
+										>
+											{category.name}
+										</SelectItem>
+									))}
+								</Select>
 							</div>
+							<Button
+								color='primary'
+								onPress={() => {
+									fetchProducts(
+										parseInt(categoryFilter, 10),
+										nameFilter,
+										parseInt(minPriceFilter, 10),
+										parseInt(maxPriceFilter, 10)
+									);
+								}}
+							>
+								Aplicar filtros
+							</Button>
+							<Button
+								color='danger'
+								onPress={() => {
+									cleanFilters();
+								}}
+							>
+								Quitar filtros
+							</Button>
 						</div>
 						<div className='w-full flex lg:hidden flex-col gap-2'>
 							<Input
@@ -122,6 +185,8 @@ export default function CollectionPage() {
 									<SearchIcon className='text-base text-default-400 pointer-events-none flex-shrink-0' />
 								}
 								type='search'
+								value={nameFilter}
+								onValueChange={setNameFilter}
 							/>
 							<div className='flex flex-row gap-2'>
 								<Input
@@ -135,6 +200,8 @@ export default function CollectionPage() {
 											</span>
 										</div>
 									}
+									value={minPriceFilter}
+									onValueChange={setMinPriceFilter}
 								/>
 								<Input
 									type='number'
@@ -147,90 +214,88 @@ export default function CollectionPage() {
 											</span>
 										</div>
 									}
+									value={maxPriceFilter}
+									onValueChange={setMaxPriceFilter}
 								/>
 							</div>
-							<Accordion>
-								<AccordionItem
-									key='1'
-									aria-label='Categorías'
-									title='Categorías'
+							<div className='max-h-full overflow-y-auto'>
+								<Select
+									selectedKeys={categoryFilter}
+									onChange={handleSelectionChange}
+									label='Categoría'
+									placeholder='Elige una categoría'
+									className='max-w-xs'
 								>
-									<div className='max-h-full'>
-										<CheckboxGroup
-											orientation='horizontal'
-											defaultValue={[
-												'acción',
-												'carreras',
-											]}
+									<SelectItem key={0} value={0}>
+										Todas
+									</SelectItem>
+									{categories.map((category: any) => (
+										<SelectItem
+											key={category.id}
+											value={category.id}
 										>
-											<Checkbox value='acción'>
-												Acción
-											</Checkbox>
-											<Checkbox value='artes marciales'>
-												Artes Marciales
-											</Checkbox>
-											<Checkbox value='aventuras'>
-												Aventuras
-											</Checkbox>
-											<Checkbox value='carreras'>
-												Carreras
-											</Checkbox>
-											<Checkbox value='ciencia ficción'>
-												Ciencia Ficción
-											</Checkbox>
-											<Checkbox value='comedia'>
-												Comedia
-											</Checkbox>
-											<Checkbox value='demencia'>
-												Demencia
-											</Checkbox>
-											<Checkbox value='demonios'>
-												Demonios
-											</Checkbox>
-											<Checkbox value='deportes'>
-												Deportes
-											</Checkbox>
-											<Checkbox value='drama'>
-												Drama
-											</Checkbox>
-											<Checkbox value='ecchi'>
-												Ecchi
-											</Checkbox>
-										</CheckboxGroup>
-									</div>
-								</AccordionItem>
-							</Accordion>
+											{category.name}
+										</SelectItem>
+									))}
+								</Select>
+							</div>
+							<Button
+								color='primary'
+								onPress={() => {
+									fetchProducts(
+										parseInt(categoryFilter, 10),
+										nameFilter,
+										parseInt(minPriceFilter, 10),
+										parseInt(maxPriceFilter, 10)
+									);
+								}}
+							>
+								Aplicar filtros
+							</Button>
+							<Button
+								color='danger'
+								onPress={() => {
+									cleanFilters();
+								}}
+							>
+								Quitar filtros
+							</Button>
 						</div>
 						<div className='w-full lg:w-3/4'>
 							<div className='flex flex-col gap-12 justify-center'>
 								<div className='gap-2 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-									{list.map((item, index) => (
-										<Link key={item.id} href={`/product/${item.id}`}>
-										
-										  <Card
-											className='max-w-[222px]'
-											shadow='sm'
-											isPressable
-											onPress={() => console.log('item pressed')}
-										  >
-											<CardBody className='overflow-visible p-0'>
-											  <Image
-												isZoomed
+									{products.map((item: any, index) => (
+										<Link
+											key={item.id}
+											href={`/product/${item.id}`}
+										>
+											<Card
+												className='max-w-[222px]'
 												shadow='sm'
-												radius='lg'
-												width='100%'
-												alt={item.name}
-												className='w-full object-cover h-[300px] md:h-[340px]'
-												src={item.image}
-											  />
-											</CardBody>
-											<CardFooter className='text-small justify-between max-w-[222px]'>
-											  <b>{item.name}</b>
-											  <p className='text-default-500'>{item.price}</p>
-											</CardFooter>
-										  </Card>
-					
-									  </Link>
+												isPressable
+												onPress={() =>
+													console.log('item pressed')
+												}
+											>
+												<CardBody className='overflow-visible p-0'>
+													<Image
+														isZoomed
+														shadow='sm'
+														radius='lg'
+														width='100%'
+														alt={item.name}
+														className='w-full object-cover h-[300px] md:h-[340px]'
+														src={item.image}
+													/>
+												</CardBody>
+												<CardFooter className='text-small justify-between max-w-[222px]'>
+													<b>{item.name}</b>
+													<p className='text-default-500'>
+														${item.price}
+													</p>
+												</CardFooter>
+											</Card>
+										</Link>
 									))}
 								</div>
 							</div>

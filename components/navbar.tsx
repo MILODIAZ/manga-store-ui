@@ -10,6 +10,22 @@ import {
 	NavbarBrand,
 	NavbarItem,
 	NavbarMenuItem,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+	Table,
+	TableBody,
+	TableCell,
+	TableColumn,
+	TableHeader,
+	TableRow,
+	useDisclosure,
+	Checkbox,
+	Modal,
+	ModalBody,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
 } from '@nextui-org/react';
 
 import { link as linkStyles } from '@nextui-org/theme';
@@ -27,31 +43,14 @@ import {
 	SearchIcon,
 	LoginIcon,
 	CartIcon,
+	DeleteIcon,
+	LockIcon,
 } from '@/components/icons';
 
 import { Logo } from '@/components/icons';
 
 export const Navbar = () => {
-	const searchInput = (
-		<Input
-			aria-label='Search'
-			classNames={{
-				inputWrapper: 'bg-default-100',
-				input: 'text-sm',
-			}}
-			endContent={
-				<Kbd className='hidden lg:inline-block' keys={['command']}>
-					K
-				</Kbd>
-			}
-			labelPlacement='outside'
-			placeholder='Search...'
-			startContent={
-				<SearchIcon className='text-base text-default-400 pointer-events-none flex-shrink-0' />
-			}
-			type='search'
-		/>
-	);
+	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
 	return (
 		<NextUINavbar maxWidth='xl' position='sticky'>
@@ -92,23 +91,217 @@ export const Navbar = () => {
 			>
 				<NavbarItem className='hidden lg:flex gap-2'>
 					<ThemeSwitch />
-					<Link isExternal href={siteConfig.links.twitter}>
-						<CartIcon className='text-default-500' />
-					</Link>
-					<Link isExternal href={siteConfig.links.discord}>
-						<LoginIcon className='text-default-500' />
-					</Link>
+					<Popover placement='bottom-end' backdrop='blur'>
+						<PopoverTrigger>
+							<Button isIconOnly variant='light'>
+								<CartIcon className='text-default-500' />
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className='p-0 pb-4'>
+							<Table
+								removeWrapper
+								aria-label='Example static collection table'
+							>
+								<TableHeader>
+									<TableColumn>PRODUCTO</TableColumn>
+									<TableColumn>CANTIDAD</TableColumn>
+									<TableColumn>MONTO</TableColumn>
+									<TableColumn>{''}</TableColumn>
+								</TableHeader>
+								<TableBody>
+									<TableRow key='1'>
+										<TableCell>Naruto #1</TableCell>
+										<TableCell>x2</TableCell>
+										<TableCell>$10000</TableCell>
+										<TableCell>
+											<Button
+												isIconOnly
+												color='danger'
+												variant='light'
+											>
+												<DeleteIcon />
+											</Button>
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+							<Button color='primary'>Checkout</Button>
+						</PopoverContent>
+					</Popover>
+
+					<Button isIconOnly onPress={onOpen} variant='light'>
+						<LoginIcon />
+					</Button>
+					<Modal
+						isOpen={isOpen}
+						onOpenChange={onOpenChange}
+						placement='top-center'
+					>
+						<ModalContent>
+							{(onClose) => (
+								<>
+									<ModalHeader className='flex flex-col gap-1'>
+										Log in
+									</ModalHeader>
+									<ModalBody>
+										<Input
+											autoFocus
+											endContent={<LoginIcon />}
+											label='Nombre de usuario'
+											placeholder='Ingresa tu nombre de usuario'
+											variant='bordered'
+										/>
+										<Input
+											endContent={
+												<LockIcon className='text-2xl text-default-400 pointer-events-none flex-shrink-0' />
+											}
+											label='Contraseña'
+											placeholder='Ingresa tu contraseña'
+											type='password'
+											variant='bordered'
+										/>
+										<div className='flex py-2 px-1 justify-between'>
+											<Checkbox
+												classNames={{
+													label: 'text-small',
+												}}
+											>
+												Recuérdame
+											</Checkbox>
+											<Link
+												color='primary'
+												href='#'
+												size='sm'
+											>
+												¿Aún no tienes una cuenta?
+											</Link>
+										</div>
+									</ModalBody>
+									<ModalFooter>
+										<Button
+											color='danger'
+											variant='flat'
+											onPress={onClose}
+										>
+											Cerrar
+										</Button>
+										<Button
+											color='primary'
+											onPress={onClose}
+										>
+											Ingresar
+										</Button>
+									</ModalFooter>
+								</>
+							)}
+						</ModalContent>
+					</Modal>
 				</NavbarItem>
 			</NavbarContent>
 
 			<NavbarContent className='lg:hidden basis-1 pl-4' justify='end'>
 				<ThemeSwitch />
-				<Link isExternal href={siteConfig.links.twitter}>
-					<CartIcon className='text-default-500' />
-				</Link>
-				<Link isExternal href={siteConfig.links.discord}>
-					<LoginIcon className='text-default-500' />
-				</Link>
+				<Popover placement='bottom-end' backdrop='blur'>
+					<PopoverTrigger>
+						<Button isIconOnly variant='light'>
+							<CartIcon className='text-default-500' />
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className='p-0 pb-4'>
+						<Table
+							removeWrapper
+							aria-label='Example static collection table'
+						>
+							<TableHeader>
+								<TableColumn>PRODUCTO</TableColumn>
+								<TableColumn>CANTIDAD</TableColumn>
+								<TableColumn>MONTO</TableColumn>
+								<TableColumn>{''}</TableColumn>
+							</TableHeader>
+							<TableBody>
+								<TableRow key='1'>
+									<TableCell>Naruto #1</TableCell>
+									<TableCell>x2</TableCell>
+									<TableCell>$10000</TableCell>
+									<TableCell>
+										<Button
+											isIconOnly
+											color='danger'
+											variant='light'
+										>
+											<DeleteIcon />
+										</Button>
+									</TableCell>
+								</TableRow>
+							</TableBody>
+						</Table>
+						<Button color='primary'>Checkout</Button>
+					</PopoverContent>
+				</Popover>
+				<Button isIconOnly onPress={onOpen} variant='light'>
+					<LoginIcon />
+				</Button>
+				<Modal
+					isOpen={isOpen}
+					onOpenChange={onOpenChange}
+					placement='top-center'
+				>
+					<ModalContent>
+						{(onClose) => (
+							<>
+								<ModalHeader className='flex flex-col gap-1'>
+									Log in
+								</ModalHeader>
+								<ModalBody>
+									<Input
+										autoFocus
+										endContent={<LoginIcon />}
+										label='Nombre de usuario'
+										placeholder='Ingresa tu nombre de usuario'
+										variant='bordered'
+									/>
+									<Input
+										endContent={
+											<LockIcon className='text-2xl text-default-400 pointer-events-none flex-shrink-0' />
+										}
+										label='Contraseña'
+										placeholder='Ingresa tu contraseña'
+										type='password'
+										variant='bordered'
+									/>
+									<div className='flex py-2 px-1 justify-between'>
+										<Checkbox
+											classNames={{
+												label: 'text-small',
+											}}
+										>
+											Recuérdame
+										</Checkbox>
+										<Link
+											color='primary'
+											href='#'
+											size='sm'
+										>
+											¿Aún no tienes una cuenta?
+										</Link>
+									</div>
+								</ModalBody>
+								<ModalFooter>
+									<Button
+										color='danger'
+										variant='flat'
+										onPress={onClose}
+									>
+										Cerrar
+									</Button>
+									<Button color='primary' onPress={onClose}>
+										Ingresar
+									</Button>
+								</ModalFooter>
+							</>
+						)}
+					</ModalContent>
+				</Modal>
 				<NavbarMenuToggle />
 			</NavbarContent>
 
