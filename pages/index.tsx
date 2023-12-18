@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { database as list } from '@/components/database';
 import DefaultLayout from '@/layouts/default';
 import { title, subtitle } from '@/components/primitives';
 import { Button, Image, Card, CardBody, CardFooter } from '@nextui-org/react';
@@ -9,8 +8,6 @@ import { createTransaction } from './api/api';
 
 export default function IndexPage() {
 	const [hotProducts, setHotProducts] = useState([]);
-	const [token, setToken] = useState('');
-	const [url, setURL] = useState('');
 
 	// const refreshPage = async () => {
 	// 	setHotProducts([]);
@@ -26,14 +23,6 @@ export default function IndexPage() {
 		fetchData();
 	}, []);
 
-	const createT = async () => {
-		try {
-			const result = await createTransaction();
-			setToken(result.token);
-			setURL(result.url);
-		} catch (error) {}
-	};
-
 	return (
 		<DefaultLayout>
 			{/* <div>
@@ -41,15 +30,7 @@ export default function IndexPage() {
 					Mostrar datos GraphQL
 				</Button>
 			</div> */}
-			<section>
-				<Button onPress={() => createT()}>crear transacción</Button>
-			</section>
-			<section>
-				<form method='get' action={url}>
-					<input type='hidden' name='token_ws' value={token} />
-					<input type='submit' value='Ir a pagar' />
-				</form>
-			</section>
+
 			<section className='flex flex-col items-center justify-center gap-4 py-8 md:py-10'>
 				<div className='inline-block text-center justify-center'>
 					<h1 className={title({ color: 'violet' })}>

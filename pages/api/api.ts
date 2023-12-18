@@ -111,26 +111,89 @@ export async function getProduct(id: number) {
 	return product.data.product;
 }
 
-export async function createTransaction() {
-	try {
-		const response = await fetch('http://localhost:10000/payment/create', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			// Puedes agregar más opciones según tus necesidades (cuerpo, etc.)
-		});
-
-		if (!response.ok) {
-			throw new Error(
-				`Error al crear la transacción. Código de estado: ${response.status}`
-			);
-		}
-
-		const data = await response.json();
-		return data;
-	} catch (error: any) {
-		console.error('Error al crear la transacción:', error.message);
-		throw error; // Puedes manejar el error según tus necesidades
+const transactionMutation = `
+mutation TransactionQuery($amount: Int!){
+	createTransaction(amount: $amount){
+	  token
+	  url
 	}
+  }
+`;
+
+export async function createTransaction(amount: number) {
+	let variables: any = {
+		amount,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: transactionMutation,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	return result.data.createTransaction;
+}
+
+const confirmMutation = `
+mutation ConfirmTransactionQuery($token: String!){
+	confirmTransaction(token: $token)
+  }
+`;
+
+export async function confirmTransaction(token: string) {
+	let variables: any = {
+		token,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: confirmMutation,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	return result.data.confirmTransaction;
+}
+
+const purchaseMutation = `
+mutation PurchaseMutation($userName: String!, $itemsIDs: [Int!]!, $productNames: [productQty!]!) {
+  purchase(userName: $userName, itemsIDs: $itemsIDs, productNames: $productNames)
+}
+`;
+
+export async function purchase(
+	userName: string = '',
+	itemsIDs: number[] = [],
+	productNames: { name: string; quantity: number }[] = []
+) {
+	let variables: any = {
+		userName,
+		itemsIDs,
+		productNames,
+	};
+
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			query: purchaseMutation,
+			variables,
+		}),
+	});
+
+	let result = await results.json();
+	return result.data.purchase;
 }

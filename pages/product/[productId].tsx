@@ -6,8 +6,13 @@ import DefaultLayout from '@/layouts/default';
 import { title } from '@/components/primitives';
 import { Button } from '@nextui-org/react';
 import { getProduct } from '../api/api';
+import { useCart } from '@/hooks/useCart';
 
 export default function ProductDetail() {
+	const { handleAddProductToCart, cartProducts } = useCart();
+	const [isProductInCart, setIsProductInCart] = useState(false);
+	const [productLoaded, setProductLoaded] = useState(false);
+
 	const router = useRouter();
 	const { productId } = router.query;
 
@@ -18,8 +23,25 @@ export default function ProductDetail() {
 		try {
 			const result = await getProduct(id);
 			setProduct(result);
+			setProductLoaded(true);
 		} catch (error) {}
 	};
+
+	console.log(cartProducts);
+
+	useEffect(() => {
+		if (productLoaded) {
+			setIsProductInCart(false);
+			if (cartProducts) {
+				const existingIndex = cartProducts.findIndex(
+					(item) => item.product === product.name
+				);
+				if (existingIndex > -1) {
+					setIsProductInCart(true);
+				}
+			}
+		}
+	}, [cartProducts, productLoaded]);
 
 	useEffect(() => {
 		if (productId && !isNaN(Number(productId))) {
@@ -40,7 +62,7 @@ export default function ProductDetail() {
 							src={product.image}
 						/>
 					</div>
-					<div className='flex w-5/6 md:w-1/2 justify-center'>
+					<div className='flex w-5/6 md:w-1/2 justify-center min-w-[60%]'>
 						<div className='md:w-4/6'>
 							<h1 className={title({ color: 'yellow' })}>
 								{product.name}
@@ -51,36 +73,57 @@ export default function ProductDetail() {
 								Disponibles: {product.totalStock}
 							</p>
 							<div className='flex flex-row mt-8'>
-								<Input
-									type='number'
-									placeholder='1'
-									labelPlacement='outside'
-									startContent={
-										<div className='pointer-events-none flex items-center'>
-											<span className='text-default-400 text-small'>
-												Cantidad:
-											</span>
-										</div>
-									}
-									min={1}
-									max={product.totalStock}
-									value={quantity}
-									onValueChange={setQuantity}
-								/>
-								<Button
-									color={
-										product.totalStock === 0
-											? 'danger'
-											: 'primary'
-									}
-									className='text-xs py-1'
-									onClick={() => console.log('click')}
-									disabled={product.totalStock === 0}
-								>
-									{product.totalStock === 0
-										? 'Out of Stock'
-										: 'Añadir al carrito'}
-								</Button>
+								{isProductInCart ? (
+									<>
+										<p>
+											<span>AÑADIDO AL CARRO!!!</span>
+										</p>
+									</>
+								) : (
+									<>
+										<Input
+											type='number'
+											placeholder='1'
+											labelPlacement='outside'
+											startContent={
+												<div className='pointer-events-none flex items-center'>
+													<span className='text-default-400 text-small'>
+														Cantidad:
+													</span>
+												</div>
+											}
+											min={1}
+											max={product.totalStock}
+											value={quantity}
+											onValueChange={setQuantity}
+										/>
+										<Button
+											color={
+												product.totalStock === 0
+													? 'danger'
+													: 'primary'
+											}
+											className='text-xs py-1'
+											onClick={() => {
+												handleAddProductToCart({
+													product: product.name,
+													quantity: quantity,
+													total:
+														product.price *
+														quantity,
+												});
+												/*setProductLoaded(
+													!productLoaded
+												);*/
+											}}
+											disabled={product.totalStock === 0}
+										>
+											{product.totalStock === 0
+												? 'Out of Stock'
+												: 'Añadir al carrito'}
+										</Button>
+									</>
+								)}
 							</div>
 
 							<br />
