@@ -40,11 +40,12 @@ import { LoginIcon, CartIcon, DeleteIcon, LockIcon } from '@/components/icons';
 
 import { Logo } from '@/components/icons';
 import { useCart } from '@/hooks/useCart';
-import React from 'react';
+import React, { useState } from 'react';
 
 export const Navbar = () => {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 	const { cartProducts, handleRemoveProductFromCart } = useCart();
+	const { showLogin, setShowLogin } = useState(false);
 
 	const columns = [
 		{
@@ -226,6 +227,7 @@ export const Navbar = () => {
 								<ModalHeader className='flex flex-col gap-1'>
 									Log In
 								</ModalHeader>
+
 								<ModalBody>
 									<Input
 										autoFocus
@@ -253,13 +255,14 @@ export const Navbar = () => {
 										</Checkbox>
 										<Link
 											color='primary'
-											href='#'
+											href='/register'
 											size='sm'
 										>
 											¿Aún no tienes una cuenta?
 										</Link>
 									</div>
 								</ModalBody>
+
 								<ModalFooter>
 									<Button
 										color='danger'

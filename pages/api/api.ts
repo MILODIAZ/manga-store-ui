@@ -197,3 +197,47 @@ export async function purchase(
 	let result = await results.json();
 	return result.data.purchase;
 }
+
+const createUserMutation = `
+mutation CreateUserMutation($data: userDto!) {
+  createUser(data: $data){
+	name
+	lastName
+	userName
+	email
+	id
+  }
+}
+`;
+
+export async function createUser(data: {
+	name: string;
+	lastName: string;
+	userName: string;
+	email: string;
+	password: string;
+}) {
+	console.log(data);
+	let variables: any = {
+		data,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: createUserMutation,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	if (result.data === null) {
+		console.log('register failed');
+		return 'register failed';
+	}
+	console.log('register successfully');
+	return 'register successfully';
+}
