@@ -22,7 +22,8 @@ export default function ConfirmTransaction() {
 	const router = useRouter();
 	const { token_ws } = router.query;
 
-	const { cartProducts, handleEmptyCart } = useCart();
+	const { cartProducts, handleEmptyCart, inSession, inSessionUserName } =
+		useCart();
 
 	const [transactionResult, setTransactionResult] = useState('standby');
 
@@ -44,9 +45,15 @@ export default function ConfirmTransaction() {
 					name: item.product,
 					quantity: item.quantity,
 				}));
-				console.log(productNames);
-				//AQUÍ QUIERO ITERAR
-				purchase('', [], productNames);
+
+				if (inSession) {
+					const itemIds = cartProducts.map((item) =>
+						parseInt(item.id)
+					);
+					purchase(inSessionUserName, itemIds, productNames);
+				} else {
+					purchase('', [], productNames);
+				}
 				handleEmptyCart();
 			}
 		} catch (error) {}

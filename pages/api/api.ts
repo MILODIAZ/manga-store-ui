@@ -235,9 +235,133 @@ export async function createUser(data: {
 	});
 	let result = await results.json();
 	if (result.data === null) {
-		console.log('register failed');
-		return 'register failed';
+		return 'Register failed';
 	}
-	console.log('register successfully');
-	return 'register successfully';
+
+	return 'Register successfully';
+}
+
+const loginMutation = `mutation LoginMutation($data: loginDto!) {
+	login(data: $data){
+	  user{
+		userName
+		name
+		lastName
+		email
+	  }
+	  jwt
+	  cart{
+		id
+		product
+		quantity
+		total
+		orderId
+	  }
+	}  
+  }`;
+
+export async function loginAPI(data: { userName: string; password: string }) {
+	let variables: any = {
+		data,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: loginMutation,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	return result;
+}
+
+const createCartItemMutation = `mutation CreateCartItemMutation($data: createProductItemInput!){
+	createProductItem(data: $data)
+  }`;
+
+export async function createItem(data: {
+	userName: string;
+	productName: string;
+	quantity: number;
+}) {
+	let variables: any = {
+		data,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: createCartItemMutation,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	return result.data.createProductItem;
+}
+
+const deleteItemMutation = `mutation DeleteCartItemMutation($id: Int!, $userName: String!){
+	deleteProductItem(id: $id, userName:$userName)
+  }`;
+
+export async function deleteItem(id: number, userName: string) {
+	console.log(typeof id);
+	let variables: any = {
+		id,
+		userName,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: deleteItemMutation,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	return result.data.deleteProductItem;
+}
+
+const getOrdersQuery = `query GetOrdersQuery($userName: String!){
+	getOrders(userName: $userName){
+	  id
+	  items{
+		product{
+		  name
+		}
+		quantity
+	  }
+	}
+  }`;
+
+export async function getOrders(userName: string) {
+	let variables: any = {
+		userName,
+	};
+	let results = await fetch('http://localhost:8000/graphql', {
+		method: 'POST',
+
+		headers: {
+			'Content-Type': 'application/json',
+		},
+
+		body: JSON.stringify({
+			query: getOrdersQuery,
+			variables,
+		}),
+	});
+	let result = await results.json();
+	return result.data.getOrders;
 }

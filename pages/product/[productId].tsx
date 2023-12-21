@@ -5,11 +5,16 @@ import { useEffect, useState } from 'react';
 import DefaultLayout from '@/layouts/default';
 import { title } from '@/components/primitives';
 import { Button } from '@nextui-org/react';
-import { getProduct } from '../api/api';
+import { createItem, getProduct } from '../api/api';
 import { useCart } from '@/hooks/useCart';
 
 export default function ProductDetail() {
-	const { handleAddProductToCart, cartProducts } = useCart();
+	const {
+		handleAddProductToCart,
+		cartProducts,
+		inSession,
+		inSessionUserName,
+	} = useCart();
 	const [isProductInCart, setIsProductInCart] = useState(false);
 	const [productLoaded, setProductLoaded] = useState(false);
 
@@ -19,6 +24,22 @@ export default function ProductDetail() {
 	const [product, setProduct] = useState<any>(null);
 	const [quantity, setQuantity] = useState<number>(1);
 
+	const fetchCreateItem = async () => {
+		try {
+			const result = await createItem({
+				userName: inSessionUserName,
+				productName: product.name,
+				quantity: parseInt(quantity),
+			});
+			handleAddProductToCart({
+				id: result,
+				product: product.name,
+				quantity: parseInt(quantity),
+				total: product.price * quantity,
+			});
+		} catch (error) {}
+	};
+
 	const fetchData = async (id: number) => {
 		try {
 			const result = await getProduct(id);
@@ -26,8 +47,6 @@ export default function ProductDetail() {
 			setProductLoaded(true);
 		} catch (error) {}
 	};
-
-	console.log(cartProducts);
 
 	useEffect(() => {
 		if (productLoaded) {
@@ -105,16 +124,18 @@ export default function ProductDetail() {
 											}
 											className='text-xs py-1'
 											onClick={() => {
-												handleAddProductToCart({
-													product: product.name,
-													quantity: quantity,
-													total:
-														product.price *
-														quantity,
-												});
-												/*setProductLoaded(
-													!productLoaded
-												);*/
+												if (inSession) {
+													fetchCreateItem();
+												} else {
+													handleAddProductToCart({
+														product: product.name,
+														quantity:
+															parseInt(quantity),
+														total:
+															product.price *
+															quantity,
+													});
+												}
 											}}
 											disabled={product.totalStock === 0}
 										>

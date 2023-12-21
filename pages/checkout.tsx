@@ -15,10 +15,15 @@ import React from 'react';
 
 import { useCart } from '@/hooks/useCart';
 import DefaultLayout from '@/layouts/default';
-import { createTransaction } from './api/api';
+import { createTransaction, deleteItem } from './api/api';
 
 export default function Checkout() {
-	const { cartProducts, handleRemoveProductFromCart } = useCart();
+	const {
+		cartProducts,
+		handleRemoveProductFromCart,
+		inSession,
+		inSessionUserName,
+	} = useCart();
 	const [cartTotal, setCartTotal] = useState(0);
 
 	const [token, setToken] = useState('');
@@ -81,9 +86,18 @@ export default function Checkout() {
 					case 'actions':
 						return (
 							<Button
-								onPress={() =>
-									handleRemoveProductFromCart(product.product)
-								}
+								onPress={() => {
+									if (inSession) {
+										deleteItem(
+											parseInt(product.id, 10),
+											inSessionUserName
+										);
+									}
+
+									handleRemoveProductFromCart(
+										product.product
+									);
+								}}
 								variant='light'
 							>
 								<DeleteIcon />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input } from '@nextui-org/react';
+import toast, { Toast } from 'react-hot-toast';
 
 import DefaultLayout from '@/layouts/default';
 import { createUser } from './api/api';
@@ -16,6 +17,17 @@ export default function Register() {
 		try {
 			const result = await createUser(data);
 			console.log(result);
+			if (result === 'Register successfully') {
+				toast.success('Register Succesfully');
+				setUserName('');
+				setName('');
+				setLastName('');
+				setEmail('');
+				setPassword('');
+				setConfirmPassword('');
+			} else {
+				toast.error(result);
+			}
 		} catch (error) {}
 	};
 

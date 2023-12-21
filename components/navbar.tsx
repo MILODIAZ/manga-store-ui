@@ -27,6 +27,7 @@ import {
 	ModalFooter,
 	ModalHeader,
 	getKeyValue,
+	User,
 } from '@nextui-org/react';
 
 import { link as linkStyles } from '@nextui-org/theme';
@@ -41,11 +42,45 @@ import { LoginIcon, CartIcon, DeleteIcon, LockIcon } from '@/components/icons';
 import { Logo } from '@/components/icons';
 import { useCart } from '@/hooks/useCart';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { deleteItem, loginAPI } from '@/pages/api/api';
 
 export const Navbar = () => {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
-	const { cartProducts, handleRemoveProductFromCart } = useCart();
-	const { showLogin, setShowLogin } = useState(false);
+	const {
+		cartProducts,
+		handleRemoveProductFromCart,
+		handleEmptyCart,
+		handleLogin,
+		inSession,
+		handleLogout,
+		inSessionName,
+		inSessionLastName,
+		inSessionUserName,
+		inSessionEmail,
+		handleLoadUserCart,
+	} = useCart();
+
+	const [loginUserName, setLoginUserName] = useState('');
+	const [loginPassword, setLoginPassword] = useState('');
+
+	const fetchLogin = async (data: any) => {
+		try {
+			const result = await loginAPI(data);
+			if (result.data) {
+				toast.success('Acceso exitoso!');
+				setLoginUserName('');
+				setLoginPassword('');
+				const userData = result.data.login.user;
+				userData.jwt = result.data.login.jwt;
+				handleLogin(userData);
+				console.log(result.data.login.cart);
+				handleLoadUserCart(result.data.login.cart);
+			} else {
+				toast.error('Usuario o contraseña incorrectos :/');
+			}
+		} catch (error) {}
+	};
 
 	const columns = [
 		{
@@ -82,9 +117,18 @@ export const Navbar = () => {
 					case 'actions':
 						return (
 							<Button
-								onPress={() =>
-									handleRemoveProductFromCart(product.product)
-								}
+								onPress={() => {
+									if (inSession) {
+										deleteItem(
+											parseInt(product.id, 10),
+											inSessionUserName
+										);
+									}
+
+									handleRemoveProductFromCart(
+										product.product
+									);
+								}}
 								variant='light'
 							>
 								<DeleteIcon />
@@ -216,69 +260,139 @@ export const Navbar = () => {
 				<Button isIconOnly onPress={onOpen} variant='light'>
 					<LoginIcon />
 				</Button>
-				<Modal
-					isOpen={isOpen}
-					onOpenChange={onOpenChange}
-					placement='top-center'
-				>
-					<ModalContent>
-						{(onClose) => (
-							<>
-								<ModalHeader className='flex flex-col gap-1'>
-									Log In
-								</ModalHeader>
+				{inSession ? (
+					<Modal
+						isOpen={isOpen}
+						onOpenChange={onOpenChange}
+						placement='top-center'
+					>
+						<ModalContent>
+							{(onClose) => (
+								<>
+									<ModalHeader className='flex flex-col gap-1'>
+										Bienvenido {inSessionUserName}
+									</ModalHeader>
 
-								<ModalBody>
-									<Input
-										autoFocus
-										endContent={<LoginIcon />}
-										label='Nombre de usuario'
-										placeholder='Ingresa tu nombre de usuario'
-										variant='bordered'
-									/>
-									<Input
-										endContent={
-											<LockIcon className='text-2xl text-default-400 pointer-events-none flex-shrink-0' />
-										}
-										label='Contraseña'
-										placeholder='Ingresa tu contraseña'
-										type='password'
-										variant='bordered'
-									/>
-									<div className='flex py-2 px-1 justify-between'>
-										<Checkbox
-											classNames={{
-												label: 'text-small',
+									<ModalBody>
+										<User
+											name={
+												inSessionName +
+												' ' +
+												inSessionLastName
+											}
+											description={inSessionEmail}
+											avatarProps={{
+												src: 'https://styles.redditmedia.com/t5_3cz815/styles/communityIcon_sjqivpf4rkc81.png',
+											}}
+										/>
+									</ModalBody>
+
+									<ModalFooter>
+										<Button
+											href='/orders'
+											as={Link}
+											color='primary'
+											onPress={onClose}
+										>
+											Mis compras
+										</Button>
+										<Button
+											color='danger'
+											variant='flat'
+											onPress={() => {
+												handleLogout();
+												onClose();
+												handleEmptyCart();
+												toast.success('Sesión cerrada');
 											}}
 										>
-											Recuérdame
-										</Checkbox>
-										<Link
-											color='primary'
-											href='/register'
-											size='sm'
-										>
-											¿Aún no tienes una cuenta?
-										</Link>
-									</div>
-								</ModalBody>
+											Cerrar Sesión
+										</Button>
+									</ModalFooter>
+								</>
+							)}
+						</ModalContent>
+					</Modal>
+				) : (
+					<Modal
+						isOpen={isOpen}
+						onOpenChange={onOpenChange}
+						placement='top-center'
+					>
+						<ModalContent>
+							{(onClose) => (
+								<>
+									<ModalHeader className='flex flex-col gap-1'>
+										Log In
+									</ModalHeader>
 
-								<ModalFooter>
-									<Button
-										color='danger'
-										variant='flat'
-										onPress={onClose}
-									>
-										Cerrar
-									</Button>
-									<Button color='primary' onPress={onClose}>
-										Ingresar
-									</Button>
-								</ModalFooter>
-							</>
-						)}
-					</ModalContent>
-				</Modal>
+									<ModalBody>
+										<Input
+											autoFocus
+											endContent={<LoginIcon />}
+											label='Nombre de usuario'
+											placeholder='Ingresa tu nombre de usuario'
+											variant='bordered'
+											value={loginUserName}
+											onValueChange={setLoginUserName}
+										/>
+										<Input
+											endContent={
+												<LockIcon className='text-2xl text-default-400 pointer-events-none flex-shrink-0' />
+											}
+											label='Contraseña'
+											placeholder='Ingresa tu contraseña'
+											type='password'
+											variant='bordered'
+											value={loginPassword}
+											onValueChange={setLoginPassword}
+										/>
+										<div className='flex py-2 px-1 justify-between'>
+											<Checkbox
+												classNames={{
+													label: 'text-small',
+												}}
+											>
+												Recuérdame
+											</Checkbox>
+											<Link
+												color='primary'
+												href='/register'
+												size='sm'
+											>
+												¿Aún no tienes una cuenta?
+											</Link>
+										</div>
+									</ModalBody>
+
+									<ModalFooter>
+										<Button
+											color='danger'
+											variant='flat'
+											onPress={onClose}
+										>
+											Cerrar
+										</Button>
+										<Button
+											color='primary'
+											onPress={() => {
+												const data = {
+													userName: loginUserName,
+													password: loginPassword,
+												};
+												fetchLogin(data);
+												onClose();
+											}}
+										>
+											Ingresar
+										</Button>
+									</ModalFooter>
+								</>
+							)}
+						</ModalContent>
+					</Modal>
+				)}
+
 				<NavbarMenuToggle />
 			</NavbarContent>
 
